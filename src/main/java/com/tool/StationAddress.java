@@ -5,12 +5,10 @@ package com.tool;
  * Description:
  *
  * @author: kevin
- * Date: 2018-12-12
- * Time: 19:38
+ * Date: 2018-12-13
+ * Time: 20:38
  */
-public class Fdd {
-    private Long id;
-    private String communityName;
+public class StationAddress {
     private String stationName;
     private String area;
     private String company;
@@ -22,22 +20,6 @@ public class Fdd {
 
     public void setOverrideType(String overrideType) {
         this.overrideType = overrideType;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCommunityName() {
-        return communityName;
-    }
-
-    public void setCommunityName(String communityName) {
-        this.communityName = communityName;
     }
 
     public String getStationName() {
@@ -62,5 +44,14 @@ public class Fdd {
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    @Override
+    public String toString() {
+        return "StationAddress{" +
+                "stationName='" + stationName + '\'' +
+                ", area='" + area + '\'' +
+                ", company='" + company + '\'' +
+                '}';
     }
 }

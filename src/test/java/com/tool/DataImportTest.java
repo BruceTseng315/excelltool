@@ -4,12 +4,11 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,7 +47,7 @@ public class DataImportTest {
         dataMode.setColumnandFieldNameMap(map);
         dataMode.setDataClass(Fdd.class);
 
-        List<Fdd> fdds = DataImport.importExcel(in,dataMode);
+        List<Fdd> fdds = DataImportUtil.importExcel(in,dataMode);
         System.out.println(fdds.size());
     }
     @org.junit.Test
@@ -74,8 +73,28 @@ public class DataImportTest {
         dataMode.setColumnandFieldNameMap(map);
         dataMode.setDataClass(BaseStation.class);
 
-        List<BaseStation> baseStations = DataImport.importExcel(in,dataMode);
+        List<BaseStation> baseStations = DataImportUtil.importExcel(in,dataMode);
         System.out.println(baseStations.size());
 
+    }
+
+    @Test
+    public void importBaseStation() {
+    }
+
+    @Test
+    public void importFdd1() throws Exception{
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long startTime = sdf.parse("2018-12-09 00:00:00").getTime();
+        long endtime = sdf.parse("2018-12-11 23:59:59").getTime();
+        Date date = new Date(startTime);
+        System.out.println(date.getTimezoneOffset());
+    }
+
+    @Test
+    public void importExitCommunity()throws Exception {
+        ProcessMain.init();
+        List<ExitCommunity> exitCommunities = DataImport.importExitCommunity();
+        System.out.println("after filter,size:"+exitCommunities.size());
     }
 }
