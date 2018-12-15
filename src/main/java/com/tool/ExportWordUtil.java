@@ -1,6 +1,8 @@
 package com.tool;
 
 import org.apache.poi.POIXMLDocument;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.springframework.util.StringUtils;
@@ -9,8 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,7 +24,7 @@ import java.util.Map;
  * Time: 16:36
  */
 public class ExportWordUtil {
-   public static void exportEordTest(WordStatistics wordStatistics)throws Exception{
+   public static void exportEordTest(Map<String,AreaStatistics> areaStatisticsMap)throws Exception{
 
 
        //读取word 模板源文件
@@ -30,14 +33,13 @@ public class ExportWordUtil {
         // POIFSFileSystem pfs = new POIFSFileSystem(fileInputStream);
        XWPFDocument document = new XWPFDocument(fileInputStream);
 
+
         //获取所有表格
        List<XWPFTable> tables = document.getTables();
         //这里简单取第一个表格
        XWPFTable table = tables.get(0);
 
        List<XWPFTableRow> rows = table.getRows();
-       //表格的插入行有两种方式，这里使用addNewRowBetween，因为这样会保留表格的样式，就像我们在word文档的表格中插入行一样。注意这里不要使用insertNewTableRow方法插入新行，这样插入的新行没有样式，很难看
-       System.out.println(table.getRows().size());
        //模板的那一行
        XWPFTableRow tmpRow = rows.get(2);
        List<XWPFTableCell> tmpCells = null;
@@ -45,8 +47,15 @@ public class ExportWordUtil {
        XWPFTableCell tmpCell = null;
        tmpCells = tmpRow.getTableCells();
 
-       for(int i=0;i<3;i++) {
+       Iterator<Map.Entry<String,AreaStatistics>> iterator = areaStatisticsMap.entrySet().iterator();
+
+       int[] total = new int[17];//保存最后一行的合计
+
+       while(iterator.hasNext()) {
+           Map.Entry<String,AreaStatistics> entry = iterator.next();
+           String area = entry.getKey();
            XWPFTableRow row = table.createRow();
+           AreaStatistics areaStatistics = entry.getValue();
 
            // 获取模板的行高 设置为新一行的行高
            row.setHeight(tmpRow.getHeight());
@@ -54,30 +63,94 @@ public class ExportWordUtil {
            System.out.println("rows cess num:"+cells.size());
            System.out.println(table.getRows().size());
 
-           if (row == null) {
-               System.out.println("row2 is null");
-           }
+
            String cellText = null;
            String cellTextKey = null;
-           for (int j = 0; j < cells.size(); j++) {
-               tmpCell = tmpCells.get(j);
-               XWPFTableCell cell = cells.get(j);
-               cellText = tmpCell.getText();
-              // if (!StringUtils.isEmpty(cellText)) {
-                   //转换为mapkey对应的字段
-                  // cellTextKey = cellText.replace("$", "").replace("{", "").replace("}", "");
+           XWPFTableCell cell = null;
 
-                   setCellText(tmpCell,cell,String.valueOf(j));
+           tmpCell = tmpCells.get(0);
+           cell = cells.get(0);
+           setCellText(tmpCell,cell,area);
 
-               //}
+           tmpCell = tmpCells.get(1);
+           cell = cells.get(1);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getAddCountOfOutside()));
+           total[0] += areaStatistics.getAddCountOfOutside();
 
-           }
+           tmpCell = tmpCells.get(2);
+           cell = cells.get(2);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getAddCountOfInside()));
+           total[1] += areaStatistics.getAddCountOfInside();
 
-           mergeCellsHorizontal(table,0,1,3);
-           mergeCellsHorizontal(table,0,5,7);
-           mergeCellsHorizontal(table,0,9,11);
-           mergeCellsHorizontal(table,0,13,16);
+           tmpCell = tmpCells.get(3);
+           cell = cells.get(3);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getAddCountOfInside()+areaStatistics.getAddCountOfOutside()));
+           total[2] += (areaStatistics.getAddCountOfInside()+areaStatistics.getAddCountOfOutside());
+
+           tmpCell = tmpCells.get(5);
+           cell = cells.get(5);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSaveCountOfOutside()));
+           total[4] += areaStatistics.getSaveCountOfOutside();
+
+           tmpCell = tmpCells.get(6);
+           cell = cells.get(6);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSaveCountOfInside()));
+           total[5] += areaStatistics.getSaveCountOfInside();
+
+           tmpCell = tmpCells.get(7);
+           cell = cells.get(7);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSaveCountOfOutside()+areaStatistics.getSaveCountOfInside()));
+           total[6] += (areaStatistics.getSaveCountOfOutside()+areaStatistics.getSaveCountOfInside());
+
+
+
        }
+       //添加总计行
+       XWPFTableRow row = table.createRow();
+       XWPFTableCell cell = null;
+       tmpCells = row.getTableCells();
+       cell = tmpCells.get(0);
+       cell.setText("合计");
+       for(int i=0;i<total.length;i++){
+           cell = tmpCells.get(i+1);
+           cell.setText(String.valueOf(total[i]));
+       }
+
+       //替换模板标记文本
+       Map<String,String> map = new HashMap<>();
+       map.put("${1}",String.valueOf(total[2]));
+       map.put("${2}",String.valueOf(total[3]));
+       map.put("${3}",String.valueOf(total[6]));
+       map.put("${4}",String.valueOf(total[7]));
+       map.put("${5}",String.valueOf(total[10]));
+       map.put("${6}",String.valueOf(total[8]));
+       map.put("${7}",String.valueOf(total[9]));
+       map.put("${8}",String.valueOf(total[11]));
+       map.put("${9}",String.valueOf(total[14]));
+       map.put("${10}",String.valueOf(total[15]));
+       System.out.println(map);
+      List<XWPFParagraph> paragraphs =  document.getParagraphs();
+      for(XWPFParagraph paragraph:paragraphs){
+         //replaceInPara(paragraph,map);
+          List<XWPFRun> runs = paragraph.getRuns();
+          for (int i = 0; i < runs.size(); i++) {
+              String oneparaString = runs.get(i).getText(
+                      runs.get(i).getTextPosition());
+              for (Map.Entry<String, String> entry : map
+                      .entrySet()) {
+                  oneparaString = oneparaString.replace(
+                          entry.getKey(), entry.getValue());
+              }
+              runs.get(i).setText(oneparaString, 0);
+          }
+
+      }
+
+       //合并单元格，必须最后做
+       mergeCellsHorizontal(table,0,1,3);
+       mergeCellsHorizontal(table,0,5,7);
+       mergeCellsHorizontal(table,0,9,11);
+       mergeCellsHorizontal(table,0,13,16);
        //删除模板行
        table.removeRow(2);
        fileInputStream.close();
@@ -88,6 +161,7 @@ public class ExportWordUtil {
        document.write(output);
 
        output.close();
+
    }
 
     /**
@@ -299,5 +373,70 @@ public class ExportWordUtil {
         }
 
     }
+
+    /**
+     * 替换段落里面的变量
+     *
+     * @param para   要替换的段落
+     * @param params 参数
+     */
+    public static void replaceInPara(XWPFParagraph para, Map<String, String> params) {
+        List<XWPFRun> runs;
+        Matcher matcher;
+        if (matcher(para.getParagraphText()).find()) {
+            runs = para.getRuns();
+
+            int start = -1;
+            int end = -1;
+            String str = "";
+            for (int i = 0; i < runs.size(); i++) {
+                XWPFRun run = runs.get(i);
+                String runText = run.toString();
+                if(runText == null || runText.length() <2) continue;
+                System.out.println("------>>>>>>>>>" + runText);
+                if ('$' == runText.charAt(0)&&'{' == runText.charAt(1)) {
+                    start = i;
+                }
+                if ((start != -1)) {
+                    str += runText;
+                }
+                if ('}' == runText.charAt(runText.length() - 1)) {
+                    if (start != -1) {
+                        end = i;
+                        break;
+                    }
+                }
+            }
+            System.out.println("start--->"+start);
+            System.out.println("end--->"+end);
+
+            System.out.println("str---->>>" + str);
+
+            for (int i = start; i <= end; i++) {
+                para.removeRun(i);
+                i--;
+                end--;
+                System.out.println("remove i="+i);
+            }
+
+            for (String key : params.keySet()) {
+                if (str.equals(key)) {
+                    para.createRun().setText((String) params.get(key));
+                    break;
+                }
+            }
+
+
+        }
+    }
+    /**	 * 正则匹配字符串	 * @param paragraphText	 * @return	 */
+    public static Matcher matcher(String str) {
+        Pattern pattern = Pattern.compile("\\$\\{(.+?)\\}", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(str);
+        return matcher;
+    }
+
+
+
 
 }

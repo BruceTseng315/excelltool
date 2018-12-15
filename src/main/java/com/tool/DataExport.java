@@ -33,7 +33,7 @@ public class DataExport {
         map.put("厂家","company");
         map.put("区域","area");
         map.put("覆盖类型","overrideType");
-        map.put("今日新增","add");
+        map.put("今日新增","isAdd");
         map.put("连续退服天数","continueDays");
         dataMode.setColumnandFieldNameMap(map);
 

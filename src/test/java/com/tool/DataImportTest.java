@@ -97,4 +97,10 @@ public class DataImportTest {
         List<ExitCommunity> exitCommunities = DataImport.importExitCommunity();
         System.out.println("after filter,size:"+exitCommunities.size());
     }
+
+    @Test
+    public void importYesterday()throws Exception {
+        ProcessMain.init();
+        List<StationOfThreeDay> stationOfThreeDays = DataImport.importYesterday();
+    }
 }

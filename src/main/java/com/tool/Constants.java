@@ -19,5 +19,7 @@ public class Constants {
     public static String exitCommunityFilePath;
     public static String reportModuleFilePath;
     public static String reportOutFilePath;
+    //昨日的三天统计情况文件路径
+    public static String yesterdayThreeDayFilePath;
 
 }

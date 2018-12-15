@@ -69,7 +69,7 @@ public class DataImportUtil {
 
         int firstCellNum = row.getFirstCellNum();
         int lastCellNum = row.getPhysicalNumberOfCells();
-        String[] fieldNames = new String[lastCellNum];
+        String[] fieldNames = new String[lastCellNum];//保存表头
         for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++) {
             Cell cell = row.getCell(cellNum);
             fieldNames[cellNum - firstCellNum] = getCellValue(cell, String.class);

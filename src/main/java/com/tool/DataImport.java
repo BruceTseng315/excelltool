@@ -117,4 +117,36 @@ public class DataImport {
 
         return exitCommunities;
     }
+
+    public static List<StationOfThreeDay> importYesterday(){
+        FileInputStream in = null;
+        try {
+            File file = new File(Constants.yesterdayThreeDayFilePath);
+            in = new FileInputStream(file);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        DataMode<StationOfThreeDay> dataMode = new DataMode<>();
+        //此处使用LinkedHashMap保持插入顺序与存取顺序一致
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("站名","stationName");//必须与表头一致
+        map.put("firstday","countFirstDay");
+        map.put("secondday","countSecondDay");
+        map.put("thirdday","countThirdDay");
+        map.put("总计","countSum");
+        map.put("厂家","company");
+        map.put("区域","area");
+        map.put("覆盖类型","overrideType");
+        map.put("今日新增","isAdd");
+        map.put("连续退服天数","continueDays");
+
+        dataMode.setColumnandFieldNameMap(map);
+        dataMode.setDataClass(StationOfThreeDay.class);
+
+        List<StationOfThreeDay> stationOfThreeDays = DataImportUtil.importExcel(in,dataMode);
+        System.out.println("导入数量："+stationOfThreeDays.size());
+        System.out.println("list:"+stationOfThreeDays);
+        return stationOfThreeDays;
+    }
 }

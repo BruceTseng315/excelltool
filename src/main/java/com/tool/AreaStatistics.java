@@ -12,23 +12,23 @@ public class AreaStatistics {
     //区域名称
     private String areaName;
     //新增宏站数量
-    private  Integer addCountOfOutside;
+    private  int addCountOfOutside;
     //新增室分数量
-    private Integer addCountOfInside;
+    private int addCountOfInside;
     //新增较昨日
-    private Integer addCompareToYesterday;
+    private int addCompareToYesterday;
     //存量宏站数量
-    private Integer saveCountOfOutside;
+    private int saveCountOfOutside;
     //存量室分数量
-    private Integer saveCountOfInside;
+    private int saveCountOfInside;
     //存量较昨日
-    private Integer saveCompareToYesterday;
+    private int saveCompareToYesterday;
     //今日宏站退服总数
-    private Integer sumOfOutside;
+    private int sumOfOutside;
     //今日室分退服总数
-    private Integer sumOfInside;
+    private int sumOfInside;
     //今日退服总数较昨日
-    private Integer sumCompareToYesterday;
+    private int sumCompareToYesterday;
 
     public String getAreaName() {
         return areaName;
@@ -38,75 +38,88 @@ public class AreaStatistics {
         this.areaName = areaName;
     }
 
-    public Integer getAddCountOfOutside() {
+    public int getAddCountOfOutside() {
         return addCountOfOutside;
     }
 
-    public void setAddCountOfOutside(Integer addCountOfOutside) {
+    public void setAddCountOfOutside(int addCountOfOutside) {
         this.addCountOfOutside = addCountOfOutside;
     }
 
-    public Integer getAddCountOfInside() {
+    public int getAddCountOfInside() {
         return addCountOfInside;
     }
 
-    public void setAddCountOfInside(Integer addCountOfInside) {
+    public void setAddCountOfInside(int addCountOfInside) {
         this.addCountOfInside = addCountOfInside;
     }
 
-    public Integer getAddCompareToYesterday() {
+    public int getAddCompareToYesterday() {
         return addCompareToYesterday;
     }
 
-    public void setAddCompareToYesterday(Integer addCompareToYesterday) {
+    public void setAddCompareToYesterday(int addCompareToYesterday) {
         this.addCompareToYesterday = addCompareToYesterday;
     }
 
-    public Integer getSaveCountOfOutside() {
+    public int getSaveCountOfOutside() {
         return saveCountOfOutside;
     }
 
-    public void setSaveCountOfOutside(Integer saveCountOfOutside) {
+    public void setSaveCountOfOutside(int saveCountOfOutside) {
         this.saveCountOfOutside = saveCountOfOutside;
     }
 
-    public Integer getSaveCountOfInside() {
+    public int getSaveCountOfInside() {
         return saveCountOfInside;
     }
 
-    public void setSaveCountOfInside(Integer saveCountOfInside) {
+    public void setSaveCountOfInside(int saveCountOfInside) {
         this.saveCountOfInside = saveCountOfInside;
     }
 
-    public Integer getSaveCompareToYesterday() {
+    public int getSaveCompareToYesterday() {
         return saveCompareToYesterday;
     }
 
-    public void setSaveCompareToYesterday(Integer saveCompareToYesterday) {
+    public void setSaveCompareToYesterday(int saveCompareToYesterday) {
         this.saveCompareToYesterday = saveCompareToYesterday;
     }
 
-    public Integer getSumOfOutside() {
+    public int getSumOfOutside() {
         return sumOfOutside;
     }
 
-    public void setSumOfOutside(Integer sumOfOutside) {
+    public void setSumOfOutside(int sumOfOutside) {
         this.sumOfOutside = sumOfOutside;
     }
 
-    public Integer getSumOfInside() {
+    public int getSumOfInside() {
         return sumOfInside;
     }
 
-    public void setSumOfInside(Integer sumOfInside) {
+    public void setSumOfInside(int sumOfInside) {
         this.sumOfInside = sumOfInside;
     }
 
-    public Integer getSumCompareToYesterday() {
+    public int getSumCompareToYesterday() {
         return sumCompareToYesterday;
     }
 
-    public void setSumCompareToYesterday(Integer sumCompareToYesterday) {
+    public void setSumCompareToYesterday(int sumCompareToYesterday) {
         this.sumCompareToYesterday = sumCompareToYesterday;
+    }
+
+    public void incAddCountOfOutside(){
+        this.addCountOfOutside++;
+    }
+    public void incAddCountOfInside(){
+        this.addCountOfInside++;
+    }
+    public void incSaveCountOfOutside(){
+        this.saveCountOfOutside++;
+    }
+    public void incSaveCountOfInside(){
+        this.saveCountOfInside++;
     }
 }

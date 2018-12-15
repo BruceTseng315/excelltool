@@ -3,6 +3,8 @@ package com.tool;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 /**
@@ -14,16 +16,26 @@ import static org.junit.Assert.*;
  * Time: 17:02
  */
 public class ExportWordUtilTest {
+    Map<String,StationOfThreeDay> stationOfThreeDayMap;
     @Before
     public void init(){
-        //初始化report文件路径
-        Constants.reportModuleFilePath = "E:\\excell\\输出\\report_module.docx";
-        Constants.reportOutFilePath = "E:\\excell\\输出\\report.docx";
+
+        try {
+            //初始化，包括起始日期，文件路径
+            ProcessMain.init();
+            System.out.println(Constants.firstDay);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("day init error");
+            return;
+        }
+        stationOfThreeDayMap = ProcessMain.getThreeDayForOutPut();
     }
 
     @Test
     public void exportEordTest()throws Exception {
-       // ExportWordUtil.exportEordTest();
+        Map<String,AreaStatistics> areaStatisticsMap = WordStatisticsUtil.areaStatistics(stationOfThreeDayMap);
+        ExportWordUtil.exportEordTest(areaStatisticsMap);
 
     }
 }

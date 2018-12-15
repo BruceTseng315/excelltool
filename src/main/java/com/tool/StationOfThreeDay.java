@@ -1,5 +1,8 @@
 package com.tool;
 
+import com.tool.enums.AddEnum;
+import com.tool.enums.OverrideEnum;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -23,9 +26,10 @@ public class StationOfThreeDay {
     private String company;
     //基站所在区域
     private String area;
+    //覆盖类型
     private String overrideType;
     //新增
-    private Boolean isAdd;
+    private String isAdd;
     //连续退服天数
     private Integer continueDays;
 
@@ -93,12 +97,12 @@ public class StationOfThreeDay {
         this.overrideType = overrideType;
     }
 
-    public Boolean getAdd() {
+    public String getIsAdd() {
         return isAdd;
     }
 
-    public void setAdd(Boolean add) {
-        isAdd = add;
+    public void setIsAdd(String isAdd) {
+        this.isAdd = isAdd;
     }
 
     public Integer getContinueDays() {

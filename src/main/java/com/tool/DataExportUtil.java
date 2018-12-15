@@ -1,5 +1,7 @@
 package com.tool;
 
+import com.tool.enums.AddEnum;
+import com.tool.enums.OverrideEnum;
 import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -169,6 +171,12 @@ public class DataExportUtil {
             }
 
             cell.setCellValue(builder.toString());
+        }else if(value instanceof OverrideEnum){
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue(((OverrideEnum)value).getType());
+        }else if(value instanceof AddEnum){
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue(((AddEnum)value).getType());
         }
 
     }

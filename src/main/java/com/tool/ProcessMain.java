@@ -1,5 +1,7 @@
 package com.tool;
 
+import com.tool.enums.AddEnum;
+import com.tool.enums.OverrideEnum;
 import org.springframework.beans.BeanUtils;
 import sun.util.locale.provider.DateFormatProviderImpl;
 
@@ -25,6 +27,11 @@ public class ProcessMain {
             System.out.println("day init error");
             return;
         }
+        Map<String,StationOfThreeDay> stationOfThreeDayMap = ProcessMain.getThreeDayForOutPut();
+      DataExport.writeThreeDayExcell(stationOfThreeDayMap);
+
+    }
+    public static Map<String,StationOfThreeDay> getThreeDayForOutPut(){
         //读取退服记录
         List<ExitCommunity> exitCommunities = null;
         try {
@@ -32,7 +39,7 @@ public class ProcessMain {
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("读取退服记录出错");
-            return;
+            return null;
         }
         //读取fdd 基站信息
         List<Fdd> fdds = DataImport.importFdd();
@@ -40,36 +47,38 @@ public class ProcessMain {
         Map<String,String> fddMap = new HashMap<>();
         //fdd和baseStation放入map，基站名为key，用来查找基站对应的厂家、区域信息
         Map<String,StationAddress> stationAddressMap = new HashMap<>();
-      for(Fdd fdd:fdds){
-          fddMap.put(fdd.getCommunityName(),fdd.getStationName());
-          //将fdd基站信息放入stationAddressMap
-          StationAddress stationAddress = new StationAddress();
-          BeanUtils.copyProperties(fdd,stationAddress);
-          stationAddressMap.put(fdd.getStationName(),stationAddress);
-      }
+        for(Fdd fdd:fdds){
+            fddMap.put(fdd.getCommunityName(),fdd.getStationName());
+            //将fdd基站信息放入stationAddressMap
+            StationAddress stationAddress = new StationAddress();
+            BeanUtils.copyProperties(fdd,stationAddress);
+            stationAddressMap.put(fdd.getStationName(),stationAddress);
+        }
 
-      List<BaseStation> baseStations = DataImport.importBaseStation();
+        List<BaseStation> baseStations = DataImport.importBaseStation();
         //LTE放入map，小区名为key,基站为value，用于查找小区对应的基站
-      Map<String,String> baseStationMap = new HashMap<>();
-      for(BaseStation baseStation:baseStations){
-          baseStationMap.put(baseStation.getCommunityName(),baseStation.getStationName());
-          //将LTE基站信息放入stationAddressMap
-          StationAddress stationAddress = new StationAddress();
-          BeanUtils.copyProperties(baseStation,stationAddress);
-          stationAddressMap.put(baseStation.getStationName(),stationAddress);
-      }
+        Map<String,String> baseStationMap = new HashMap<>();
+        for(BaseStation baseStation:baseStations){
+            baseStationMap.put(baseStation.getCommunityName(),baseStation.getStationName());
+            //将LTE基站信息放入stationAddressMap
+            StationAddress stationAddress = new StationAddress();
+            BeanUtils.copyProperties(baseStation,stationAddress);
+            stationAddressMap.put(baseStation.getStationName(),stationAddress);
+        }
 
-      //将退服记录中小区名替换成基站名
-      ProcessMain.changeCommunityNameByStationName(exitCommunities,baseStationMap,fddMap);
-      //统计每个基站的三天退服记录，stationOfThreeDayMap的key为基站，value为统计记录
-      Map<String,StationOfThreeDay> stationOfThreeDayMap = ProcessMain.statisticsExitCommunity(exitCommunities,stationAddressMap);
-      //过滤掉非连续三天出现退服记录的基站
-      stationOfThreeDayMap = ProcessMain.filterStationOfThreeDay(stationOfThreeDayMap);
-      System.out.println("map size:"+stationOfThreeDayMap.size());
-      //输出excell
-      DataExport.writeThreeDayExcell(stationOfThreeDayMap);
+        //将退服记录中小区名替换成基站名
+        ProcessMain.changeCommunityNameByStationName(exitCommunities,baseStationMap,fddMap);
+        //统计每个基站的三天退服记录，stationOfThreeDayMap的key为基站，value为统计记录
+        Map<String,StationOfThreeDay> stationOfThreeDayMap = ProcessMain.statisticsExitCommunity(exitCommunities,stationAddressMap);
+        //过滤掉非连续三天出现退服记录的基站
+        stationOfThreeDayMap = ProcessMain.filterStationOfThreeDay(stationOfThreeDayMap);
+        System.out.println("map size:"+stationOfThreeDayMap.size());
+        //输出excell
+        stationOfThreeDayMap =  ProcessMain.compareToYesterday(stationOfThreeDayMap);
 
+        return stationOfThreeDayMap;
     }
+    //统计每个基站三天的退服情况
     public static Map<String,StationOfThreeDay> statisticsExitCommunity(List<ExitCommunity> exitCommunities,Map<String,StationAddress> stationAddressMap){
         //key 为基站名，value为基站连续三天的统计记录
         Map<String,StationOfThreeDay> stationOfThreeDayMap = new HashMap<>();
@@ -80,14 +89,25 @@ public class ProcessMain {
                 stationOfThreeDay = new StationOfThreeDay();
                 stationOfThreeDay.setStationName(communityName);
                 if(communityName.contains("W")) {
-                    stationOfThreeDay.setOverrideType("室分");
-                }else{
-                    stationOfThreeDay.setOverrideType("宏站");
+                    stationOfThreeDay.setOverrideType(OverrideEnum.inside.getType());
+                }else {
+                    stationOfThreeDay.setOverrideType(OverrideEnum.outside.getType());
                 }
                 if(stationAddressMap.get(communityName)!=null) {
                     stationOfThreeDay.setArea(stationAddressMap.get(communityName).getArea());
                     stationOfThreeDay.setCompany(stationAddressMap.get(communityName).getCompany());
                     System.out.println("area:"+stationOfThreeDay.getArea()+"  comn:"+stationOfThreeDay.getCompany());
+                }else {//处理KXD64-EFH-2 -- 看KXD64-EFH 是否存在
+                    String temp = communityName.substring(0,communityName.length()-2);
+                    StationAddress stationAddress = stationAddressMap.get(temp);
+                    if(stationAddress == null){
+                        temp = communityName.substring(0,communityName.length()-3);
+                        stationAddress = stationAddressMap.get(temp);
+                    }
+                    if(stationAddress != null){
+                        stationOfThreeDay.setArea(stationAddressMap.get(temp).getArea());
+                        stationOfThreeDay.setCompany(stationAddressMap.get(temp).getCompany());
+                    }
                 }
                 stationOfThreeDayMap.put(communityName,stationOfThreeDay);
             }
@@ -119,7 +139,6 @@ public class ProcessMain {
         Iterator<Map.Entry<String,StationOfThreeDay>> iterator = stationOfThreeDayMap.entrySet().iterator();
         while(iterator.hasNext()){
             Map.Entry<String,StationOfThreeDay> entry = iterator.next();
-            String communityName = entry.getKey();
             StationOfThreeDay stationOfThreeDay = entry.getValue();
             if(!(stationOfThreeDay.getCountFirstDay()>0 && stationOfThreeDay.getCountSecondDay()>0 && stationOfThreeDay.getCountThirdDay()>0)){
                 iterator.remove();
@@ -129,7 +148,7 @@ public class ProcessMain {
     }
 
     /**
-     * init do first
+     * init ,do first
      * @throws Exception
      */
     public static void init()throws Exception{
@@ -146,6 +165,10 @@ public class ProcessMain {
         Constants.exitCommunityFilePath = exitCommunityFilePath;
         Constants.baseStationFilePath = baseStationFilePath;
         Constants.fddFilePath = fddFilePath;
+        Constants.yesterdayThreeDayFilePath = "E:\\excell\\输出\\连续三天发生退服高频站点.xlsx";
+        //初始化report文件路径
+        Constants.reportModuleFilePath = "E:\\excell\\输出\\report_module.docx";
+        Constants.reportOutFilePath = "E:\\excell\\输出\\report.docx";
     }
 
     public static void changeCommunityNameByStationName(List<ExitCommunity> exitCommunities,Map<String,String> baseStationMap,Map<String,String> fddMap){
@@ -170,7 +193,7 @@ public class ProcessMain {
                     if(stationName == null) {
                         int flag = 0;
                         exCount++;
-                        exitCommunity.setCommunityName(communityName + "N/A");
+                        exitCommunity.setCommunityName(communityName);
                         Set<Map.Entry<String, String>> set = baseStationMap.entrySet();
                         Iterator<Map.Entry<String, String>> iterator = set.iterator();
                         while (iterator.hasNext()) {
@@ -225,5 +248,35 @@ public class ProcessMain {
             }
         }
         System.out.println("excount:"+exCount);
+    }
+    //于昨天统计值比较，得出新增/存量，连续退服天数
+    public static Map<String,StationOfThreeDay> compareToYesterday(Map<String,StationOfThreeDay> stationOfThreeDayMap){
+        List<StationOfThreeDay> yesterdays = DataImport.importYesterday();
+        //放入map，便于快速查找
+        Map<String,StationOfThreeDay> yesterdayMap = new HashMap<>();
+        for(StationOfThreeDay stationOfThreeDay:yesterdays){
+            yesterdayMap.put(stationOfThreeDay.getStationName(),stationOfThreeDay);
+
+        }
+        //比较
+        Iterator<Map.Entry<String,StationOfThreeDay>> iterator = stationOfThreeDayMap.entrySet().iterator();
+        while(iterator.hasNext()){
+            Map.Entry<String,StationOfThreeDay> entry = iterator.next();
+            String stationName = entry.getKey();
+            StationOfThreeDay stationOfThreeDay = entry.getValue();
+            if(stationOfThreeDay == null){
+                continue;
+            }
+            if(yesterdayMap.containsKey(stationName)){//存量,昨日统计表中已有此基站
+                stationOfThreeDay.setIsAdd(AddEnum.save.getType());
+                Integer continueDays = yesterdayMap.get(stationName).getContinueDays();
+
+                stationOfThreeDay.setContinueDays(continueDays+1);//存量+1
+            }else{//新增
+                stationOfThreeDay.setIsAdd(AddEnum.add.getType());
+                stationOfThreeDay.setContinueDays(3);
+            }
+        }
+        return stationOfThreeDayMap;
     }
 }
