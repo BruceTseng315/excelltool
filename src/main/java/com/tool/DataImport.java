@@ -2,6 +2,7 @@ package com.tool;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -16,10 +17,9 @@ import java.util.*;
 public class DataImport {
     //读取维护质量资料LTE
     public static List<BaseStation> importBaseStation(){
-        FileInputStream in = null;
+        InputStream in = null;
         try {
-            File file = new File(Constants.baseStationFilePath);
-            in = new FileInputStream(file);
+            in = DataImport.class.getResourceAsStream(Constants.baseStationFilePath);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -42,10 +42,9 @@ public class DataImport {
 
     //读取FDD
     public static List<Fdd> importFdd(){
-        FileInputStream in = null;
+        InputStream in = null;
         try {
-            File file = new File(Constants.fddFilePath);
-            in = new FileInputStream(file);
+            in = DataImport.class.getResourceAsStream(Constants.fddFilePath);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -69,10 +68,9 @@ public class DataImport {
 
     //读取退服记录
     public static List<ExitCommunity> importExitCommunity()throws Exception{
-        FileInputStream in = null;
+        InputStream in = null;
         try {
-            File file = new File(Constants.exitCommunityFilePath);
-            in = new FileInputStream(file);
+            in  = DataImport.class.getResourceAsStream(Constants.exitCommunityFilePath);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -119,10 +117,9 @@ public class DataImport {
     }
 
     public static List<StationOfThreeDay> importYesterday(){
-        FileInputStream in = null;
+        InputStream in = null;
         try {
-            File file = new File(Constants.yesterdayThreeDayFilePath);
-            in = new FileInputStream(file);
+            in = DataImport.class.getResourceAsStream(Constants.yesterdayThreeDayFilePath);
         }catch (Exception e){
             e.printStackTrace();
         }

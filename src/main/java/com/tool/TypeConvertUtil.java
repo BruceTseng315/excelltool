@@ -57,8 +57,9 @@ public class TypeConvertUtil {
 	
 
 	public static void main(String[] args) {
-		
-			System.out.println(TypeConvertUtil.convertIfNecessary(new Date(), String.class));
+		String path = TypeConvertUtil.class.getResource("/input/FDD.xlsx").getPath();
+		System.out.println(path);
+		//	System.out.println(TypeConvertUtil.convertIfNecessary(new Date(), String.class));
 		
 	}
 	

@@ -80,6 +80,8 @@ public class DataImportTest {
 
     @Test
     public void importBaseStation() {
+        String path = WordStatistics.class.getResource("FDD.xlsx").getPath();
+        System.out.println(path);
     }
 
     @Test

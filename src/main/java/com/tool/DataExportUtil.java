@@ -5,6 +5,7 @@ import com.tool.enums.OverrideEnum;
 import org.apache.poi.hssf.model.InternalWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
@@ -43,7 +44,15 @@ public class DataExportUtil {
      */
     public static <T> void writeExcel(OutputStream excelOut, DataMode<T> dataMode, List<T> datas) throws IOException {
 
-        HSSFWorkbook workbook=HSSFWorkbook.create(InternalWorkbook.createWorkbook());
+        //HSSFWorkbook workbook=HSSFWorkbook.create(InternalWorkbook.createWorkbook());
+
+
+        Workbook workbook = null;
+        if(Constants.threeDayExcellPath.endsWith(".xls")){
+            workbook = new HSSFWorkbook();
+        }else {
+            workbook = new XSSFWorkbook();
+        }
 
         writeWorkbook(workbook, dataMode, datas);
 

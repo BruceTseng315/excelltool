@@ -28,7 +28,22 @@ public class ProcessMain {
             return;
         }
         Map<String,StationOfThreeDay> stationOfThreeDayMap = ProcessMain.getThreeDayForOutPut();
-      DataExport.writeThreeDayExcell(stationOfThreeDayMap);
+        //输出excell
+        try {
+            DataExport.writeThreeDayExcell(stationOfThreeDayMap);
+        }catch (Exception e){
+            System.out.println("输出excell失败");
+            e.printStackTrace();
+        }
+
+        //输出word
+        Map<String,AreaStatistics> areaStatisticsMap = WordStatisticsUtil.areaStatistics(stationOfThreeDayMap);
+        try {
+            ExportWordUtil.exportEordTest(areaStatisticsMap);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("输出word失败");
+        }
 
     }
     public static Map<String,StationOfThreeDay> getThreeDayForOutPut(){
@@ -73,7 +88,7 @@ public class ProcessMain {
         //过滤掉非连续三天出现退服记录的基站
         stationOfThreeDayMap = ProcessMain.filterStationOfThreeDay(stationOfThreeDayMap);
         System.out.println("map size:"+stationOfThreeDayMap.size());
-        //输出excell
+
         stationOfThreeDayMap =  ProcessMain.compareToYesterday(stationOfThreeDayMap);
 
         return stationOfThreeDayMap;
@@ -159,16 +174,17 @@ public class ProcessMain {
         Date date = sdf.parse(Constants.firstDay);
         Constants.firstDayTime = date.getTime();
 
-        String exitCommunityFilePath = "E:\\excell\\输入\\20181212.xlsx";
-        String baseStationFilePath = "E:\\excell\\输入\\维护质量资料LTE基站.xlsx";
-        String fddFilePath = "E:\\excell\\输入\\FDD.xlsx";
+        String exitCommunityFilePath = "/input/20181212.xlsx";
+        String baseStationFilePath = "/input/维护质量资料LTE基站.xlsx";
+        String fddFilePath = "/input/FDD.xlsx";
         Constants.exitCommunityFilePath = exitCommunityFilePath;
         Constants.baseStationFilePath = baseStationFilePath;
         Constants.fddFilePath = fddFilePath;
-        Constants.yesterdayThreeDayFilePath = "E:\\excell\\输出\\连续三天发生退服高频站点.xlsx";
+        Constants.yesterdayThreeDayFilePath = "/input/连续三天发生退服高频站点.xlsx";
         //初始化report文件路径
-        Constants.reportModuleFilePath = "E:\\excell\\输出\\report_module.docx";
-        Constants.reportOutFilePath = "E:\\excell\\输出\\report.docx";
+        Constants.reportModuleFilePath = "/input/report_module.docx";
+        Constants.reportOutFilePath = "E:\\excell\\输出/report.docx";
+        Constants.threeDayExcellPath = "E:\\excell\\输出/three.xlsx";
     }
 
     public static void changeCommunityNameByStationName(List<ExitCommunity> exitCommunities,Map<String,String> baseStationMap,Map<String,String> fddMap){

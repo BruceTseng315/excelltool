@@ -1,6 +1,7 @@
 package com.tool;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,7 +17,7 @@ import java.util.*;
  * Time: 20:37
  */
 public class DataExport {
-    public static void writeThreeDayExcell(Map<String,StationOfThreeDay> stationOfThreeDayMap){
+    public static void writeThreeDayExcell(Map<String,StationOfThreeDay> stationOfThreeDayMap)throws Exception{
         List<StationOfThreeDay> stationOfThreeDays = new ArrayList<>();
         Iterator<Map.Entry<String,StationOfThreeDay>> iterator = stationOfThreeDayMap.entrySet().iterator();
         while(iterator.hasNext()){

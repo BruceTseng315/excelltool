@@ -7,10 +7,7 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.springframework.util.StringUtils;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,10 +25,10 @@ public class ExportWordUtil {
 
 
        //读取word 模板源文件
-       FileInputStream fileInputStream = new FileInputStream(Constants.reportModuleFilePath);
-
+      // InputStream fileInputStream = new FileInputStream(Constants.reportModuleFilePath);
+       InputStream in = DataImport.class.getResourceAsStream(Constants.reportModuleFilePath);
         // POIFSFileSystem pfs = new POIFSFileSystem(fileInputStream);
-       XWPFDocument document = new XWPFDocument(fileInputStream);
+       XWPFDocument document = new XWPFDocument(in);
 
 
         //获取所有表格
@@ -102,9 +99,51 @@ public class ExportWordUtil {
            setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSaveCountOfOutside()+areaStatistics.getSaveCountOfInside()));
            total[6] += (areaStatistics.getSaveCountOfOutside()+areaStatistics.getSaveCountOfInside());
 
+           tmpCell = tmpCells.get(9);
+           cell = cells.get(9);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSaveCountOfOutside()+areaStatistics.getAddCountOfOutside()));
+           total[8] += (areaStatistics.getSaveCountOfOutside()+areaStatistics.getAddCountOfOutside());
+
+           tmpCell = tmpCells.get(10);
+           cell = cells.get(10);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSaveCountOfInside()+areaStatistics.getAddCountOfInside()));
+           total[9] += (areaStatistics.getSaveCountOfInside()+areaStatistics.getAddCountOfInside());
+
+           tmpCell = tmpCells.get(11);
+           cell = cells.get(11);
+           int tempSum = areaStatistics.getSaveCountOfOutside()+areaStatistics.getAddCountOfOutside()+
+                   areaStatistics.getSaveCountOfInside()+areaStatistics.getAddCountOfInside();
+           setCellText(tmpCell,cell,String.valueOf(tempSum));
+           total[10] += tempSum;
+
+           tmpCell = tmpCells.get(13);
+           cell = cells.get(13);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSumOfExitOutside()));
+           total[12] += areaStatistics.getSumOfExitOutside();
+
+           tmpCell = tmpCells.get(14);
+           cell = cells.get(14);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSumOfEixtInside()));
+           total[13] += areaStatistics.getSumOfEixtInside();
+
+           tmpCell = tmpCells.get(15);
+           cell = cells.get(15);
+           setCellText(tmpCell,cell,String.valueOf(areaStatistics.getSumOfExitOutside()+areaStatistics.getSumOfEixtInside()));
+           total[14] += (areaStatistics.getSumOfExitOutside()+areaStatistics.getSumOfEixtInside());
+
+           tmpCell = tmpCells.get(16);
+           cell = cells.get(16);
+           int sum = areaStatistics.getSumOfExitOutside()+areaStatistics.getSumOfEixtInside();
+           int sumStation = areaStatistics.getAddCountOfInside()+areaStatistics.getAddCountOfOutside()+
+                   areaStatistics.getSaveCountOfInside()+areaStatistics.getSaveCountOfOutside();
+           int average = sum/sumStation;
+           setCellText(tmpCell,cell,String.valueOf(average));
 
 
        }
+       //总计平均每站退服
+       total[15] = total[14]/total[10];
+
        //添加总计行
        XWPFTableRow row = table.createRow();
        XWPFTableCell cell = null;
@@ -115,6 +154,7 @@ public class ExportWordUtil {
            cell = tmpCells.get(i+1);
            cell.setText(String.valueOf(total[i]));
        }
+
 
        //替换模板标记文本
        Map<String,String> map = new HashMap<>();
@@ -153,8 +193,7 @@ public class ExportWordUtil {
        mergeCellsHorizontal(table,0,13,16);
        //删除模板行
        table.removeRow(2);
-       fileInputStream.close();
-
+       in.close();
         //写到目标文件
        OutputStream output = new FileOutputStream(Constants.reportOutFilePath);
 

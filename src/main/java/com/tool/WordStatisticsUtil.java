@@ -41,12 +41,17 @@ public class WordStatisticsUtil {
                 }else {
                     areaStatistics.incSaveCountOfInside();//新增宏站站点数+1
                 }
+
+                //add室分退服总数
+                areaStatistics.setSumOfEixtInside(areaStatistics.getSumOfEixtInside()+stationOfThreeDay.getCountSum());
             }else{
                 if(add.equals(AddEnum.add.getType())){
                     areaStatistics.incAddCountOfOutside();//存量室分站点数+1
                 }else {
                     areaStatistics.incSaveCountOfOutside();//存量室分站点数+1
                 }
+                //add宏站退服总数
+                areaStatistics.setSumOfExitOutside(areaStatistics.getSumOfExitOutside()+stationOfThreeDay.getCountSum());
             }
             areaStatisticsMap.put(area,areaStatistics);
         }

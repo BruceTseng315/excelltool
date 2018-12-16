@@ -24,9 +24,9 @@ public class AreaStatistics {
     //存量较昨日
     private int saveCompareToYesterday;
     //今日宏站退服总数
-    private int sumOfOutside;
+    private int sumOfExitOutside;
     //今日室分退服总数
-    private int sumOfInside;
+    private int sumOfEixtInside;
     //今日退服总数较昨日
     private int sumCompareToYesterday;
 
@@ -86,20 +86,20 @@ public class AreaStatistics {
         this.saveCompareToYesterday = saveCompareToYesterday;
     }
 
-    public int getSumOfOutside() {
-        return sumOfOutside;
+    public int getSumOfExitOutside() {
+        return sumOfExitOutside;
     }
 
-    public void setSumOfOutside(int sumOfOutside) {
-        this.sumOfOutside = sumOfOutside;
+    public void setSumOfExitOutside(int sumOfExitOutside) {
+        this.sumOfExitOutside = sumOfExitOutside;
     }
 
-    public int getSumOfInside() {
-        return sumOfInside;
+    public int getSumOfEixtInside() {
+        return sumOfEixtInside;
     }
 
-    public void setSumOfInside(int sumOfInside) {
-        this.sumOfInside = sumOfInside;
+    public void setSumOfEixtInside(int sumOfEixtInside) {
+        this.sumOfEixtInside = sumOfEixtInside;
     }
 
     public int getSumCompareToYesterday() {

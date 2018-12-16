@@ -13,7 +13,7 @@ public class Constants {
     public static String firstDay;
     //起始天对应的时间戳
     public static long firstDayTime;
-    public static String threeDayExcellPath = "E:\\excell\\输出\\three.xls";
+    public static String threeDayExcellPath ;
     public static String baseStationFilePath;
     public static String fddFilePath;
     public static String exitCommunityFilePath;

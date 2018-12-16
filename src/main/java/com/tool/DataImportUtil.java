@@ -30,14 +30,14 @@ public class DataImportUtil {
         List<T> datas = null;
         try {
             datas = readExcel(inputStream, dataMode);
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
 
         return datas;
     }
 
-    public static <T> List<T> readExcel(InputStream inputStream, DataMode<T> dataMode) throws IOException {
+    public static <T> List<T> readExcel(InputStream inputStream, DataMode<T> dataMode) throws Exception {
 
         List<T> datas = null;
         Workbook workbook = null;
@@ -166,10 +166,11 @@ public class DataImportUtil {
         return TypeConvertUtil.convertIfNecessary(obj, class1);
     }
 
-    public static Workbook getWorkbok(InputStream in) throws IOException{
+    public static Workbook getWorkbok(InputStream in) throws Exception{
         Workbook wb = null;
 
-        wb = new XSSFWorkbook(in);
+        //wb = new XSSFWorkbook(in);
+        wb = WorkbookFactory.create(in);
 
         return wb;
     }
